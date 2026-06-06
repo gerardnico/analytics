@@ -1,0 +1,9 @@
+.idea
+.claude
+target
+# downloaded
+db/drivers
+
+# generate with the task openai
+src/main/resources/openapi/openapi.json
+src/main/resources/openapi/openapi.yaml

@@ -1,0 +1,8 @@
+version: '3'
+
+tasks:
+  openapi:
+    cmds:
+      - |
+        # start the maven build
+        mvn io.smallrye:smallrye-open-api-maven-plugin:generate-schema
