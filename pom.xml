@@ -33,6 +33,13 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>1.20.4</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -92,6 +99,61 @@
             <version>1.11.5</version>
         </dependency>
 
+        <!-- RabbitMQ native client (full control over manual ack / dead-letter topology) -->
+        <!-- Source: https://mvnrepository.com/artifact/com.rabbitmq/amqp-client -->
+        <dependency>
+            <groupId>com.rabbitmq</groupId>
+            <artifactId>amqp-client</artifactId>
+            <version>5.21.0</version>
+        </dependency>
+
+        <!-- ClickHouse JDBC driver (shaded "all" artifact bundles the http client) -->
+        <!-- Source: https://mvnrepository.com/artifact/com.clickhouse/clickhouse-jdbc -->
+        <dependency>
+            <groupId>com.clickhouse</groupId>
+            <artifactId>clickhouse-jdbc</artifactId>
+            <version>0.6.5</version>
+            <classifier>all</classifier>
+        </dependency>
+
+        <!-- MyBatis Migrations (programmatic UpOperation at startup) -->
+        <!-- Source: https://mvnrepository.com/artifact/org.mybatis/mybatis-migrations -->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis-migrations</artifactId>
+            <version>3.3.11</version>
+        </dependency>
+
+        <!-- Bucket4j token-bucket rate limiter -->
+        <!-- Source: https://mvnrepository.com/artifact/com.bucket4j/bucket4j-core -->
+        <dependency>
+            <groupId>com.bucket4j</groupId>
+            <artifactId>bucket4j-core</artifactId>
+            <version>8.10.1</version>
+        </dependency>
+
+        <!-- ===== Test ===== -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>clickhouse</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>rabbitmq</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
     <build>
         <plugins>
@@ -103,6 +165,11 @@
                     <source>21</source>
                     <target>21</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.2</version>
             </plugin>
             <plugin>
                 <!-- Doc: https://github.com/smallrye/smallrye-open-api/tree/main/tools/maven-plugin -->

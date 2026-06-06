@@ -1,0 +1,80 @@
+## Local development stack for the analytics ingestion pipeline.
+##
+##   - rabbitmq   : the event queue (management UI on http://localhost:15672)
+##   - clickhouse : the events store (HTTP on 8123, native on 9000)
+##   - superset   : BI / dashboards on http://localhost:8088 (admin / admin)
+##
+## Defaults match src .../config/AnalyticsConfig (user/password: analytics/analytics).
+services:
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: analytics-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: analytics
+      RABBITMQ_DEFAULT_PASS: analytics
+    ports:
+      - "5672:5672"     # AMQP
+      - "15672:15672"   # Management UI
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.8
+    container_name: analytics-clickhouse
+    environment:
+      CLICKHOUSE_DB: analytics
+      CLICKHOUSE_USER: analytics
+      CLICKHOUSE_PASSWORD: analytics
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    ports:
+      - "8123:8123"     # HTTP
+      - "9000:9000"     # Native
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8123/ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+
+  superset:
+    image: apache/superset:4.0.2
+    container_name: analytics-superset
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    environment:
+      ## Change this in any non-local environment.
+      SUPERSET_SECRET_KEY: "local-dev-not-secret-change-me"
+    ports:
+      - "8088:8088"
+    ## Install the ClickHouse SQLAlchemy driver, initialise the metadata DB
+    ## (ephemeral SQLite inside the container) and create the admin user, then
+    ## start the web server. Connect ClickHouse in the UI with:
+    ##   clickhousedb://analytics:analytics@clickhouse:8123/analytics
+    command:
+      - /bin/sh
+      - -c
+      - |
+        pip install clickhouse-connect &&
+        superset db upgrade &&
+        superset fab create-admin --username admin --firstname Admin --lastname User --email admin@example.com --password admin &&
+        superset init &&
+        /usr/bin/run-server.sh
+    volumes:
+      - superset_home:/app/superset_home
+
+volumes:
+  rabbitmq_data:
+  clickhouse_data:
+  superset_home:

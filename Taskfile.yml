@@ -6,3 +6,12 @@ tasks:
       - |
         # start the maven build
         mvn io.smallrye:smallrye-open-api-maven-plugin:generate-schema
+
+  start:
+    cmds:
+      - |
+        docker compose up -d
+  stop:
+    cmds:
+      - |
+        docker compose stop
