@@ -1,5 +1,6 @@
 package com.combostrap.analyics;
 
+import com.combostrap.analyics.resources.CaptureResource;
 import com.combostrap.analyics.resources.OpenApiResource;
 import com.combostrap.analyics.resources.PingResource;
 import jakarta.ws.rs.ApplicationPath;
@@ -18,6 +19,7 @@ public class AnalyticsRestApplication extends Application {
         Set<Class<?>> classes = new HashSet<>();
         classes.add(PingResource.class);
         classes.add(OpenApiResource.class);
+        classes.add(CaptureResource.class);
         return classes;
     }
 
